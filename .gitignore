@@ -1,0 +1,10 @@
+.env
+__pycache__/
+*.pyc
+
+# Debug and temporary output files
+debug_output.txt
+github_card.md
+
+# Generated markdown files (if you want to track Home.md, remove this line)
+# Home.md
