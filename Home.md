@@ -1,3 +1,176 @@
+## 251128 ##
+
+### Agent GRN correction
+
+**Flash Talk & Presentation**  
+- Sent the flash PPT and 4‑month progress materials (11/26).  
+- Adjusted fonts and grammar using Gemini; performed final proofreading.  
+
+**GNN Development & Evaluation**  
+- Set up Git: committed important files, created a new branch for GNN work.  
+- Installed PyTorch and developed `gnn_train_signor.py`.  
+- Processed protein‑protein interaction data: extracted, de‑duplicated, and stored true‑negative edges.  
+- Defined workflow: use existing true positives/negatives as the test set; train with random positive edge addition (aligned with Aaron’s method).  
+- Ensured training graphs exclude test‑set edges.  
+- Trained models; best checkpoint at epoch 232 (Validation AUC 0.85, Test AUC 0.3902, Test F1 0.7593).   
+- Fixed AUC‑ROC calculation (added proper threshold handling); verified curve shape and averaged results over 10 runs before plotting.
+- Generated prediction plots for all models.
+
+<details>
+<summary>點擊查看 GNN 訓練流程說明</summary>
+
+```
+1. Data Loading & Cleaning: Loads the full SIGNOR network and removes any edges that are present in the "True Test Set (true positive and true negative edges)" to prevent data leakage.
+
+
+
+1. Negative Sampling:
+
+    - Training: Generates random negative edges (noise) to balance the training set.
+
+    - Testing: Uses verified "True Negative" edges (biologically non-interacting pairs) for robust evaluation.
+
+1. Message Passing: Crucially, the GNN only uses positive training edges for message passing (learning node representations), but predicts on both positive and negative edges to calculate loss.
+
+1. Model Selection: The best model is selected based on Validation AUC, and that specific model checkpoint is used to calculate the final Test metrics.
+```
+
+</details>
+
+<details>
+<summary>點擊查看訓練輸出詳細資訊</summary>
+
+```
+--- Loading Graphs ---
+
+Original full graph: 25422 interactions
+
+Loading True Labels for Test Set (to exclude from training)...
+
+Filtered graph: 25357 interactions (removed 65 test edges)
+
+Total nodes: 6277
+
+Positive edges (training pool): 25357
+
+--- Generating Random Negative Edges for Train/Val ---
+
+Negative edges (random): 25357
+
+Total train/val edges: 50714
+
+Train/val balance: 25357 positives / 25357 negatives
+
+--- Preparing Test Set ---
+
+True positives: 41 edges
+
+True negatives: 26 edges
+
+Test set: 67 edges (41 pos / 26 neg)
+
+--- Using One-hot Encoding for Node Features ---
+
+Node features shape: torch.Size([6277, 6277])
+
+--- Splitting Train/Val Data ---
+
+Training: 40571 edges (20286 pos / 20285 neg)
+
+Validation: 10143 edges (5071 pos / 5072 neg)
+
+--- Model Setup ---
+
+Model parameters: 1632385
+
+
+Epoch 232: Loss=0.1161 | Val: AUC=0.8500, F1=0.7931 | Test: AUC=0.3902, F1=0.7593 ★ NEW BEST (Saved)
+
+
+
+================================================================================
+
+Training Complete
+
+================================================================================
+
+Best model from epoch: 232
+
+Best validation AUC: 0.8500
+
+Final Test AUC: 0.3902
+
+Final Test F1: 0.7593
+
+Model saved to: best_gnn_model.pth
+
+================================================================================
+```
+
+</details>
+
+**Literature Review & Paper Management**  
+- Reviewed papers and scanned recent NeurIPS & ICLR proceedings.  
+- Read and summarized:  
+  - *Can LLMs be Good Graph Judge for Knowledge Graph Construction?* (arXiv:2411.17388)  
+  - *Harnessing Diverse Perspectives: A Multi‑Agent Framework for Enhanced Error Detection in Knowledge Graphs* (arXiv:2501.15791)
+  - *SUFFICIENT CONTEXT: A NEW LENS ON RETRIEVAL‑AUGMENTED GENERATION SYSTEMS* (arXiv:2411.06037)
+- Our project aligns more with multi‑document QA/evidence aggregation than multi‑hop QA.
+- 看起來是可以當作取代我現在relavancy test的prompt，這篇基本上是純粹用prompt enfineering，換句話說，把他的prompt應用在我的agent上基本就完了，那麼現在的問題是我要如何找到sufficient prompt，在我知道現在prompt不是sufficient prompt時我該怎麼做 -> prompt裡面有explaination這段，所以以可以用explaination的回答來更新prompt做迭代，比方說explaination說年份資訊不足，那麼我就可以回去prompt說要找年份 -> 我現在在考慮Lun說的comment，refine PKN真的該被當成multi-hop QA嗎 -> 我最後傳給Lun: Thanks for sharing the paper; it was an interesting read. I've been thinking that our GRN refinement task might not actually be multi-hop QA. If I understand correctly, multi-hop QA requires chaining sequential facts from the context to derive an answer. For example, to answer whether "A affects C," one might need to connect the facts "A->B" and "B->C" (like an A->B->C chain). In our case, the process seems more parallel. We are verifying a single link (A->B) by gathering multiple pieces of supporting evidence simultaneously, which may sometimes contain conflicting information. I guess this aligns more with Multi-document QA or Evidence Aggregation?
+- Set up `paper-search-mcp` (searches arXiv, PubMed, bioRxiv, Semantic Scholar).  
+- Tested code to extract citation counts and other metadata; output JSON containing title, abstract, URL, journal, impact factor, citation number, etc.  
+
+**Tooling & Environment Setup**  
+- Installed and configured:  
+  - Zotero for reference management.  
+- Backed up repository and experimental results.  
+- Used Antigravity to troubleshoot and fix code issues.  
+
+### CovSyn article
+
+- **Manuscript organization**
+  - Copied the *Infectious Disease Modeling* manuscript into the project folder.
+  - Updated the manuscript to incorporate changes from Gemini 3.0.
+
+- **Formatting & compliance**
+  - Reformatted the document to meet IEEE style requirements for the *IEEE Journal of Biomedical and Health Informatics*.
+  - Resolved citation formatting issues throughout the manuscript.
+
+- **Content structuring**
+  - Condensed the main text to 8 pages.
+  - Relocated supplementary material (figures, tables, extended methods) to a separate supplementary file.
+
+### 其他
+
+- **Develop an automated LLM-driven reporting system**
+  - Design and implement an LLM pipeline to process completed items from Taskade.
+  - Integrate the pipeline with Taskade’s API for real‑time data extraction.
+  - Generate concise, human‑readable weekly reports in Markdown format.
+
+## 251124 ##
+
+### Agent GRN correction
+
+- **Version control**
+  - Committed all important current files to the repository.
+  - Created a new Git branch dedicated to the GNN development.
+
+- **Environment setup**
+  - Installed PyTorch and verified the installation.
+
+- **Data preparation**
+  - Extracted protein‑protein interaction data.
+  - Removed duplicate entries.
+  - Stored true‑negative samples for later use.
+
+- **Model development & training workflow**
+  - Defined the true‑positive and true‑negative sets as the test dataset.
+  - Implemented a training pipeline similar to Aaron’s approach, using random positive edge addition.
+  - Ensured that edges belonging to the test set were excluded from the training graph.
+
+- **Results**
+  - (Summary of outcomes to be inserted here.)
+
 ## 251122 ##
 
 ### Agent GRN correction
