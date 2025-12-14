@@ -1,3 +1,89 @@
+## 251214 ##
+
+### Agent GRN correction
+
+### Token Usage & Semantic Search  
+- Analyzed token usage for loaded questions and contexts; generated a token usage report (67 papers, avg 20,826 tokens, max 60,365 tokens).
+- Identified 63 files > 8 k tokens and 9 files > 32 k tokens.  
+- Re‑checked semantic‑search capabilities and documented the type of information it can provide. It cannot provide full-text nor the pdf download. But it can provide the llm short summary.
+
+### Model Evaluation & Metrics  
+- Removed `NaN` values from TP, TN, FP, and FN calculations while keeping total edge count.  
+- Re‑ran context‑window experiments after tweaking the “sufficient context” prompt.  
+- Confirmed macro‑F1 calculation is correct.  
+- Summarized key insights from previous results, including:  
+  - Abstract + title sufficiency is lower than full‑text; only ~50 % of edges are sufficiently supported by full‑text.  
+  - True‑negative edges often lack sufficient references, maybe explaining why they were removed in Signor.  
+  - The 20B model performs better on true‑negative edges because it frequently answers “I don’t know.”  
+- Generated sufficient test pie chart. Also generated the associated accuracy test.
+
+### Prompt & Query Engineering  
+- Refined `convert_question_to_query` prompt (initially returned poor synonyms); asked Claude for improvements.
+- Updated `construct_signor_question` to focus on “A activates B” / “A inhibits B.”  
+- Tested the sufficiency prompt on 10 papers – all judged insufficient; iterated on wording.  
+- Explored integrating skill‑related information into prompts to improve answer quality.  
+- Adjusted temperature and QA prompts for more consistent responses.  
+- Implemented the rater function.
+
+### Sufficiency Experiments  
+- Evaluated AU‑Cite papers for sufficiency; most should be sufficient, but many returned insufficient, indicating prompt issues.  
+- Tested specific gene pairs (e.g., MAP2K1 ↔ PPARG, MAP2K1 ↔ PPARG via phosphorylation) to see how phrasing affects sufficiency scores.  
+- Ran opposite‑direction queries (e.g., BRAF ↔ MAP2K1) and confirmed the model can correctly output “No” when appropriate.  
+- Identified cases where the model answered “No” but reported sufficiency = 0; refined the sufficiency prompt accordingly.  
+
+### Web Search Agent Development  
+- Designed a web‑search agent (based on `fetch_signor_paper_details.py`) to retrieve relevant papers:  
+  - Converts user prompts into optimized PubMed search strings.  
+  - Generates a specified number of search results (e.g., 10 papers).  
+  - Handles cases where no paper is found: pauses for user decision (manual upload vs. skip).  
+- Implemented workflow options: **manual mode** (user supplies PDFs) and **auto mode** (agent attempts full‑text retrieval; if unavailable, sets `full_text = None`).  
+- Verified that Claude cannot access full‑text behind paywalls; limited the agent to open‑access sources.  
+
+### Additional Investigations   
+- Explored using the Semantic Scholar API for article summaries (checked DOI 10.1126/science.1106148).  
+- Considered a LangGraph‑based orchestration but decided against it after discussion with Antigravity.  
+- Planned future work to specify interaction types more explicitly when needed.  
+
+## 251207 ##
+
+### Agent GRN correction
+
+**Prompt & Rater Development**
+- Wrote the rater prompt.  
+- Tested the prompt with title + abstract inputs.  
+- Explored the “A → B then B → A” scenario to see if the rater still marks sufficiency.  
+- Added a three‑option answer format (Yes / No / Unsure) and defined how “Unsure” is treated (as a negative answer).  
+
+**Sufficiency Experiments**
+- Ran the BCL2L1 → BAD query on two randomly selected papers: one truly about the pair and one about BCL2L10 / BAD; Claude correctly identified the relevant paper.  
+- Confirmed that title + abstract alone are insufficient, while full‑text more likely provides sufficient context using claude 4.5.  
+- Noted that a PubMed paper not indexed in OminiPath is inherently insufficient.  
+
+**Data Collection & Preparation**
+- Collected ~10 papers via a custom web‑search method; verified each has a full abstract.  
+- Identified that many Signor entries have PMID but lack PMCID, limiting full‑text access.  
+
+**Paper Retrieval Pipeline**
+- Designed a three‑step retrieval strategy:  
+  1. PDF extraction (if local PDF exists)  
+  2. PMC full‑text (if PMCID available)  
+  3. Jina AI lookup (using DOI or PubMed URL)  
+- Implemented PDF downloading code using paper-search-mcp. But it is incompleted. For now, I still need to do manual downloading. PubMed api doesn't provide pdf download option.
+
+**Code Development & Integration**
+- Structured my repository.
+
+**Evaluation & Scoring**
+- Loaded the Signor dataset, retrieved titles, abstracts, and full texts, and computed sufficiency scores for all papers.  
+- Plot pie chart for comparing sufficient support when only title/abstract provided or full text provided.
+- Compared results for true‑negative edges (title + abstract vs. full text) and true‑positive edges. 
+- Defined accuracy calculation: predictions of “Unsure”, `NaN` is treated as negative (No answer).  
+- Generated few tables for metrics comparison in different conditions. Also compared the prediction result of gpt-oss-20b and gpt-oss-120b.
+
+**Infrastructure & Miscellaneous** 
+- Planned incorporation of VisDoM for future analyses.  
+- Reviewed the `paper-qa` repository as a potential component for upcoming RAG implementations.  
+
 ## 251128 ##
 
 ### Agent GRN correction
