@@ -1,3 +1,153 @@
+## 260123 ##
+
+### Agent GRN correction
+
+**Data Preparation & Ground Truth**  
+- Re‑calculated accuracy using Aurelian’s ground‑truth data and updated the corresponding labels.  
+- Moved generated answer files to new directories, True Negative to True Positive:  
+  - `qa_comprehensive/full_text/rater`  
+  - `qa_comprehensive/full_text/shuffled`  
+  - `qa/gpt-oss-20b` & `qa/gpt-oss-120b`  
+  - `data/papers/signor` & `data/papers/qa_search/`  
+  - `langgraph/results/reasoning/glm-4.6/no_search/false_edges`  
+- Re‑computed accuracy metrics and experimented with different decision thresholds for GNN model (0.01 → 0.5).  
+
+**Model Evaluation & Accuracy Analysis**  
+- Ran evaluations for:  
+  - GPT‑OSS‑20b & GPT‑OSS‑120b (re‑run required)  
+  - GLM‑4.6 (no‑search mode)  
+  - Signor baseline  
+  - GNN models (added performance metrics and analysis code)  
+- Identified issues:  
+  - Macro‑F1 inconsistencies (perfect predictions yield 0.5).  
+  - High proportion of NaN or “I don’t know” answers causing low accuracy (overall acc ≈ 0.13).  
+  - Specific problematic edges (e.g., `BMI1_H2AX_up‑regulates`, `AURKA_AR`, `GNAO1_ADCY1_down‑regulates`).  
+  - Evidence‑support analysis revealed many negatives lack any supporting literature; treating NaN as False raises performance to > 0.8.  
+- Recorded benchmark accuracies:  
+  - Rater accuracy = 0.81  
+  - Random baseline accuracy = 0.875  
+- Token‑usage audit for GPT‑OSS‑120b (max 128k):  
+  - One file (`CDK1_AR_up‑regulates.json`, 130 k tokens) exceeded limit → error.  
+  - Overall token stats: min ≈ 8 k, max ≈ 90 k, mean ≈ 50 k, median ≈ 51 k.  
+
+**Paper Search & QA Pipeline Enhancements**  
+- Refactored `QA_paper_search.py`:  
+  - Improved PDF download routine (`download_pdf_from_doi`) and added retry logic for missing papers.  
+  - Made search strings configurable to broaden queries; target = 5 papers per question.  
+  - Ensured search results are stored in `true_negative` and `true_positive` folders.  
+  - Added support for loading Signor edges and moved core functions to `src` after verification.  
+- Debugged path issues preventing PDF downloads; resumed full edge‑wise paper search.  
+- Executed sufficient‑support test on 495 papers (≈ 379 min 34.9 s).  
+
+**Additional Findings & Resources**  
+- Noted relevant literature: *Language Agents Achieve Superhuman Synthesis of Scientific Knowledge* (arXiv:2409.13740).  
+
+- **Research & Reading**
+  - Reviewed documentation and tutorials:
+    - “How to implement tool use” (Claude platform)
+    - Claude Agent SDK tutorial (Claude Sonnet 4.5)
+    - Agent Skills in the SDK
+    - OpenRouter Zero Data Retention and Logging
+    - Web Reader MCP Server
+  - Read and annotated papers:
+    - *FuseLinker: Leveraging LLM’s pre‑trained text embeddings…*
+    - *GOFlowLLM – curating miRNA literature…*
+    - *An Evidence‑Grounded Research Assistant for Functional Genomics…*
+    - *On Evaluating LLM Alignment by Evaluating LLMs as Judges*
+    - *Hierarchical Retrieval with Evidence Curation for Open‑Domain Financial QA*
+    - *Fact Checking with Insufficient Evidence*
+    - Additional papers on multi‑hop QA, SEARCH‑O1, and related frameworks
+
+- **SDK / Tool Integration**
+  - Integrated Claude SDK with GLM, search (https://github.com/anthropics/life-sciences), and custom skill modules
+  - Implemented Claude SDK + GLM and tested the web‑search plugin
+  - Added and exercised the “Answer a single TRUE or FALSE…” skill
+  - Connected GLM to MCP web‑reader; experimented with PubMed/PMC plugin
+  - Checked SDK tool‑call responses and token‑usage reporting
+  - Verified Claude SDK token usage with claude-3.5 (input 9k‑68k, output 50‑2.8k, cache 7k‑571k)
+
+- **Prompt Engineering & Skill Evaluation**
+  - Compared official Claude skill vs. prompt‑engineering across 10 runs. The performance is similar, but the official skill is more time efficient.
+  - Modified prompts to enforce webReader usage for key papers
+  - Investigated why retraction notices were missed (webSearch vs. webReader)
+  - Thu pubmed search simply worked better than the webSearch and webReader becaude it has better relevant ranking system. The retracted paper wad ranked much lower than the non-retracted paper, which improve the accuracy of final answer.
+  - Refined prompts for true‑positive edge evaluation
+
+- **Code Organization & Cleanup**
+  - Consolidated scripts and test code; removed unnecessary test files
+  - Re‑structured repository into sub‑folders (e.g., QA, QA_analysis, data)
+  - Cleaned up redundant code and system‑prompt conversions
+  - Ensured main code runs after moving `.claude` files
+  - Reviewed and trimmed PDF folder contents
+  - Added README updates and final code polishing
+
+- **Testing & Evaluation**
+  - Ran 10 iterations of the same question to benchmark skill speed vs. accuracy
+  - Executed true‑positive and true‑negative edge evaluations on glm + SKILL + pubmed search:
+    - True positives: 24/48 correct
+    - True negatives: 19/19 correct
+  - The claude-4.5 basically perform the same.
+  - Performed SDK web‑search tests and plugin trials
+
+- **Version Control & Release Management**
+  - Updated Git repository with latest code and documentation
+
+- **Writing & Documentation**
+  - Integrated “Lost in the Maze” into the Introduction’s related work section
+  - Added citations for additional frameworks
+
+- **Miscellaneous**
+  - Consulted Gemini about script placement and QA integration decisions
+  - Asked Antigravity about GLM webReader parameter tuning for retraction detection
+  - Explored “BrowseComp → multi‑hop QA” and “Humanity’s Last Exam” concepts
+  - Investigated differences between SEARCH‑O1 and related approaches.
+
+### 求職
+
+- **Job search preparation**
+  - Queried potential job openings I could apply for  
+  - Gathered recommendations from 104 and LinkedIn  
+
+- **Resume / CV revision**
+  - Integrated vaccine paper into CV and LinkedIn 
+  - Revised CV using Jose’s resume as a template
+  - Reviewed Jose’s resume for inspiration  
+  - Added useful items, removed skills I don’t yet have  
+  - Highlighted work in Saez Lab and PhD credential  
+  - Decided on title phrasing (computational biology vs. leading with PhD)  
+  - Completed final proof‑read of the resume  
+
+- **LinkedIn profile updates**
+  - Updated “About” section and overall profile content  
+  - Added CovSyn paper to LinkedIn  
+  - Aligned LinkedIn details with the revised CV  
+  - Modified 104 job‑portal posting accordingly  
+
+- **Research / project documentation**
+  - Summarized concrete outcomes of my research projects  
+  - Compiled EBI and LLM‑related keywords  
+
+- **Final checks & communication**
+  - Performed overall quality check of all materials  
+  - Sent the updated resume/CV/LinkedIn information back to the recruiter/headhunter  
+
+### Learning
+
+- **Article Published:** *How to Make LLMs Speak Your Language* – A blog post detailing methods for adapting large language models to specific linguistic styles and vocabularies. [Read the article](https://monadical.com/posts/how-to-make-llms-speak-your-language.html)
+
+### CovSyn article
+
+- **Supplementary Material**
+  - Organized the supplementary files
+  - Removed duplicate content
+  - Updated figure, table, and algorithm references
+  - Corrected references to the supplementary material in the main text
+  - Proofread the supplementary document  
+
+- **Main Text**
+  - Fixed supplementary references within the main manuscript
+  - Performed proof‑reading of the main text  
+
 ## 251214 ##
 
 ### Agent GRN correction
