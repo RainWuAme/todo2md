@@ -1,3 +1,98 @@
+## 260213 ##
+
+### Agent GRN correction
+
+### Context sufficiency classifier
+- Made a flowchart for my idea of training a MLP sufficiency classifier, https://drive.google.com/file/d/1pLIBPBI9ME5U7nix1u9IrXqaxH2oESU4/view?usp=sharing.
+- Made an md file for my idea of each features' definition and way of calculation. 
+
+#### Paper Writing & Table Updates
+- Reviewed and addressed Lun's comments on the club PPT slides. The final PPT is in https://drive.google.com/file/d/1hGqr3jwAsMW0Q2eJT2OAuy41akz96D8c/view?usp=sharing
+- Updated performance tables in LaTeX for the latest results.
+- Redesigned table layout: separated "All edges" into its own table.
+- Cleaned up detailed table entries and renamed True Positive/True Negative labels.
+- Updated prompts in the paper and supplementary materials.
+
+#### Label System & Ground Truth Overhaul
+- Restructured labelling from "True Positive/True Negative" to "SUPPORTED/WRONG/UNCERTAIN".
+- Created a unified `ground_truth.csv` with SUPPORTED, WRONG, and UNCERTAIN labels.
+- Pushed updated code and new ground truth data to the repository.
+- Reorganized `data/papers/qa_search` directories to match new labels.
+
+#### Prompt Engineering & Curation Skill
+- Updated prompts across local markdown files, the evaluator, and the SDK.
+- Investigated and updated the curation SKILL for the new label system.
+- Researched how to create SKILL files — confirmed it can be done via Claude.
+- Re-checked and verified prompts after modifications.
+- Discussed whether sufficient context could eliminate UNCERTAIN answers — concluded some cases (conflicting, vague evidence) remain UNCERTAIN; noted stricter definitions may cause mismatches with other frameworks.
+- I have added the latest version of the prompt in prompts/claim_verification_N_to_K.md. I add the full definitions of the three labels there.
+
+#### Model Evaluation (New Labels)
+- Re-ran evaluations under the new 3-label system (SUPPORTED/WRONG/UNCERTAIN) since old results are not directly comparable.
+- Computed performance for: vanilla GLM (no search), GLM + web search context, and Claude SDK + GLM + PubMed search + SKILL.
+- Fixed failed batch runs with "no prediction found" and re-evaluated missing edges.
+- Wrote analysis script to calculate accuracy and confusion matrix for the 3-label system.
+- Updated data loading strategy across all scripts.
+- Moved `run_qa_glm.py` from `tests/` to `scripts/` directory.
+
+#### Presentation Preparation (Club Meeting)
+- Updated the main flow chart figure.
+- Used Antigravity to generate slide content.
+- Gathered all available resources into the project folder for the agent to reference.
+- Added figures and tables from the paper to the presentation.
+- Created temporary figures folder for new visuals.
+- Checked previous markdown meeting reports for reusable figures (most needed data updates).
+- Prepared slide content: Motivation (1–2 pages with citations on KG utility, curation challenges, and existing methods), Related Work (citing papers Lun mentioned), baseline performance (GLM no-search), Claude SDK + SKILL performance, sufficiency test results, SIGNOR reference paper sufficiency issues, and implementation details.
+
+#### Code & Pipeline Refactoring
+- Updated all data loading strategies for the new ground truth format.
+- Refactored `run_qa_glm.py`: updated prompt, fixed data loading, moved to scripts directory.
+- Modified script to handle insufficient or missing search results during QA.
+
+#### Research & Literature Review
+- Read *Synthesizing Scientific Literature with Retrieval-Augmented Language Models*.
+- Reviewed the OpenScholar repository — retriever component looks usable as a search tool.
+- Downloaded a claim verification dataset.
+- Read *Truly Self-Improving Agents Require Intrinsic Metacognitive Learning*.
+- Studied the Sufficient Context paper in detail:
+  - Analyzed quantity features (paper count), conflict features (conflict count, worst severity), evidence balance (support vs. refute ratio, source diversity), and fact confidence statistics (LLM confidence, paper metadata).
+  - Read sections on Selective RAG using sufficient context signal, fine-tuning techniques, and 5 techniques to reduce hallucinations with RAG.
+
+#### Fine-Tuning & Distillation Preparation
+- Checked and prepared dataset using SciFact and SciFact-Open for training.
+- Investigated the sufficient context classifier (GitHub repo: `hljoren/sufficientcontext`).
+- Reviewed the lightweight logistic head approach.
+
+#### Weekly Report & Tooling
+- Updated the `todo2md` workflow to run directly via Antigravity.
+- Tried to use openskill with pptx skill to automatically generate PPT slides. It was not very successful, but it gave me some ideas.
+
+### 求職
+- 投了AMD還有TAO digital. 跟TAO digital HR稍微聊了下，整體上是還行，最後是決定我等他們second batch再說。
+
+## 260204 ##
+
+### Agent GRN correction
+#### Prompt Engineering & refinement
+- Reviewed Fabio's comments and re-read related literature ("Larger and more instructable language models...").
+- Defined classification labels (Supported, Refuted, Uncertain) aligning with FEVER dataset standards.
+- Designed and refined prompts, including adding "Is there evidence", Chain-of-Thought (CoT), and handling N-to-K entity relationships.
+- Integrated prompts into the codebase and implemented handling for 'nosearch' scenarios.
+- Documented prompt definitions and labels in the paper and supplementary materials.
+- I also used SKILL to help me to do the prompt engineering.
+
+#### Pipeline Execution & Testing
+- Executed full QA pipeline (context labeling, nosearch) and created shell scripts for batch processing.
+- Tested Francesco's GLM code for claim verification. Now I can use claude SDK + the vanilla GLM model.
+- Synced code and data between server and local environments.
+
+#### Model Fine-tuning Research
+- Investigated LoRA fine-tuning using Unsloth (consulted AI assistant, read documentation).
+- Loaded Qwen3-8B model and prepared balanced dataset for distillation. I basically used our previous paper search results to create the dataset, which related to the Signor edges.
+- Read [LoRA fine-tuning Hyperparameters Guide](https://unsloth.ai/docs/get-started/fine-tuning-llms-guide/lora-hyperparameters-guide)
+- Implemented and tested initial LoRA code.
+
+
 ## 260123 ##
 
 ### Agent GRN correction

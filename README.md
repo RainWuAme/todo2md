@@ -1,86 +1,54 @@
-# Todo2MD
+# Todo2MD (Agentic Version)
 
-Automate the extraction of completed tasks from [Taskade](https://www.taskade.com/) and summarize them into your local Markdown wiki (e.g., Obsidian, VSCode) or generate structured weekly reports.
+Automate the extraction of completed tasks from [Taskade](https://www.taskade.com/) and summarize them into your `Home.md` using an Agentic Workflow (Antigravity).
 
-## Features
+## Workflow
 
--   **Fetch Completed Tasks**: Retrieves recently completed tasks from your Taskade projects.
--   **Project Filtering**: Select specific projects to process or check all of them.
--   **AI Summarization**: Uses a local LLM (via vLLM) to generate structured, human-readable summaries of your tasks.
--   **Markdown Integration**: Automatically appends the summaries to your `Home.md` file.
--   **Weekly Report Generation**: Parses `Home.md` and generates structured weekly reports with targeted updates to specific documentation files.
+Instead of running automated scripts that try to do everything (and often fail at the LLM step), this project now follows an **Agentic Workflow**.
+
+1.  **Fetch Data**: You run a simple script to fetch raw data.
+2.  **Agent Execution**: You ask the AI Agent (Antigravity) to process that data and update your report.
 
 ## Prerequisites
 
 -   Python 3.12+
--   Conda environment: `llm_grn` (or similar with required packages)
--   Taskade API Key
--   Access to a vLLM endpoint (for summarization)
+-   `TASKADE_API_KEY` set in your `.env` file.
+-   Dependencies: `requests`, `python-dotenv`
 
 ## Setup
 
-1.  **Clone the repository** (if applicable).
-
-2.  **Environment Setup**:
-    Ensure you have the `llm_grn` conda environment or install dependencies manually:
+1.  **Install Dependencies**:
     ```bash
-    conda activate llm_grn
-    pip install requests python-dotenv langchain-openai langgraph
+    pip install requests python-dotenv
     ```
 
-3.  **Configuration**:
-    Create a `.env` file in the root directory with the following variables:
+2.  **Configuration**:
+    Create a `.env` file in the root directory:
     ```env
     TASKADE_API_KEY=your_taskade_api_key_here
-    VLLM_BASE_URL=http://localhost:8000/v1
-    VLLM_MODEL_NAME=hosted_vllm/model
-    VLLM_API_KEY=EMPTY
     ```
 
 ## Usage
 
-### 1. Test Connection
-Run the interactive test script to verify your connection to Taskade and see your projects:
+### Weekly Sync
 
-```bash
-python test_taskade_connection.py
-```
-Follow the prompts to select a project or check all.
+**Just ask the Agent:**
 
-### 2. Update Daily Wiki
-Run the main script to fetch new completed tasks, summarize them, and update your `Home.md`:
+> "Execute tasks/weekly_sync.md"
+> *OR*
+> "Run the weekly sync"
 
-```bash
-python update_wiki.py
-```
+**The Agent will automatically:**
+1.  Run `python fetch_recent_tasks.py` to fetch data.
+2.  Read the fetched tasks.
+3.  Summarize them into `Home.md`.
+4.  Clean up temporary files.
 
-### 3. Generate Weekly Report
-Parse the latest week's content from `Home.md` and generate structured updates for your weekly report files:
+You do **not** need to run the python script yourself.
 
-```bash
-python generate_weekly_report.py
-```
+## Files
 
-This will:
-- Extract the most recent week's tasks from `Home.md` (identified by date headers `## YYMMDD ##`)
-- Use the LLM to categorize and summarize tasks
-- Update specific report files in the `../ebi-weekly-report` directory
-- Append a summary to the main research log with cross-references
-
-## File Structure
-
-### Core Files
--   `taskade_client.py`: Handles communication with the Taskade API.
--   `llm_client.py`: Manages the LLM connection for summarizing tasks and processing weekly reports.
--   `update_wiki.py`: Main orchestration script for daily task updates.
--   `generate_weekly_report.py`: Parses `Home.md` and generates structured weekly reports.
-
-### Test Files
--   `test_taskade_connection.py`: Interactive utility to test Taskade API connectivity.
--   `test_integration.py`: Unit tests for the `update_wiki` module.
--   `test_langgraph_client.py`: Unit tests for the LLM client.
-
-### Configuration & Output
--   `.env`: Configuration file for API keys (not committed).
--   `Home.md`: Daily task summary file (auto-generated).
--   `debug_output.txt`: Debug output from test runs (temporary).
+-   `fetch_recent_tasks.py`: Fetches completed tasks from Taskade.
+-   `tasks/weekly_sync.md`: The "brain" or workflow guide for the Agent.
+-   `taskade_client.py`: API client logic.
+-   `Home.md`: Your weekly report destination.

@@ -1,9 +1,7 @@
+import argparse
 import os
 import re
-import datetime
-import subprocess
 from typing import List, Dict
-from llm_client import process_weekly_tasks
 
 # Configuration
 HOME_MD_PATH = "Home.md"
@@ -63,6 +61,7 @@ def prepend_to_file(filepath: str, content: str, date: str):
         text_to_write = f"## {date}\n\n{content}\n"
         text_to_write_escaped = text_to_write.replace("'", "'\\''")
         cmd = f"echo '{text_to_write_escaped}' > {filepath}"
+        import subprocess
         subprocess.run(cmd, shell=True, check=True)
         print(f"Created {filepath}")
         return
@@ -91,6 +90,12 @@ def prepend_to_file(filepath: str, content: str, date: str):
     print(f"Prepended to {filepath}")
 
 def main():
+    parser = argparse.ArgumentParser(description="Distribute weekly report content from Home.md to other files.")
+    parser.parse_args()
+
+    # Ensure REPORT_DIR exists
+    os.makedirs(REPORT_DIR, exist_ok=True)
+
     print("Parsing Home.md...")
     try:
         data = parse_home_md(HOME_MD_PATH)
@@ -102,43 +107,16 @@ def main():
     content = data['content']
     print(f"Found content for date: {date}")
 
-    print("Processing tasks with LLM...")
-    result = process_weekly_tasks(content, AVAILABLE_FILES)
+    # The AI processing part is removed.
+    # This script now only serves to help distribute updates IF we had a mapping.
+    # But since we removed the AI mapper, we don't know which part goes where.
+    # The user might manually move things or we might add a regex distributor later.
+    # For now, I will just print the content found.
+    print("\nContent found in latest entry:")
+    print(content[:200] + "..." if len(content) > 200 else content)
     
-    if not result or not result.get('file_updates'):
-        print("No updates generated.")
-        return
-
-    # Update specific files
-    updated_files = []
-    for update in result['file_updates']:
-        target_file = update['target_file']
-        if target_file not in AVAILABLE_FILES:
-            print(f"Warning: Target file {target_file} not in available files. Skipping.")
-            continue
-
-        full_path = os.path.join(REPORT_DIR, target_file)
-        prepend_to_file(full_path, update['content'], date)
-        updated_files.append(target_file)
-
-    # Update main log
-    if result.get('main_summary'):
-        main_log_path = os.path.join(REPORT_DIR, MAIN_LOG_FILE)
-
-        # Construct the summary entry with links
-        links = []
-        for f in updated_files:
-            # Remove extension for title if desired, or keep it
-            title = f.replace('.md', '').replace('_', ' ')
-            link = f"[{title}, {date}]({f}#{date})"
-            links.append(link)
-
-        links_str = " ".join(links)
-        summary_entry = f"1. {result['main_summary']} {links_str}"
-
-        prepend_to_file(main_log_path, summary_entry, date)
-
-    print("Weekly report generation complete.")
+    print("\n[INFO] AI distribution logic has been removed.")
+    print("Please manually copy the relevant sections to the target files in ../ebi-weekly-report if needed.")
 
 if __name__ == "__main__":
     main()

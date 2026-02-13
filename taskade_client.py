@@ -67,9 +67,10 @@ def get_tasks_from_project(project_id):
         print(f"Error fetching tasks for project {project_id}: {e}")
         return []
 
-def get_recently_completed_tasks(since_date=None, project_filter=None):
+def get_recently_completed_tasks(project_filter=None):
     """
-    Fetches completed tasks from ALL projects (or a specific one) since the given date.
+    Fetches ALL completed tasks from projects.
+    User handles the time-window logic themselves (e.g. by clearing old tasks).
     Returns a dict: {project_name: [tasks]}
     """
     projects = get_all_projects()
@@ -90,13 +91,8 @@ def get_recently_completed_tasks(since_date=None, project_filter=None):
         for task in tasks:
             # Check if completed
             if task.get('completed'):
-                # Check date if provided
-                # Taskade completed date format needs to be checked.
-                # Usually it's in 'completedAt' or similar.
-                # Let's inspect the task object in the main loop if needed.
-                # For now, we'll just collect them and filter later if we can find the date field.
                 completed_tasks.append(task)
-        
+       
         if completed_tasks:
             results[p_name] = completed_tasks
             
