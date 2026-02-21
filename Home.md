@@ -1,10 +1,65 @@
+## 260221 ##
+
+### Agent GRN correction
+
+#### Literature Review
+- Read *Recursive Language Models*.
+- 讀LangGraph: LangChain Agent 的殺手鐧 (入門+進階)
+- Read *Evaluating Language Models for Biomedical Fact-Checking: A Benchmark Dataset for Cancer Variant Interpretation Verification* to understand domain-specific evaluation frameworks.
+
+#### Paper Feature Extraction Implementation
+- Implemented paper feature extraction tools for citation metadata and quality assessment.
+- **Metadata Features:**
+  - Publication year extraction for temporal relevance.
+  - Journal Impact Factor (IF) retrieval.
+  - Normalized citation count calculation.
+  - Author H-index integration for author credibility scoring.
+- **NLP Features Development:**
+  - Identified and switched to scispaCy for biomedical-specific NLP processing (more suitable than general NLP models).
+  - Addressed claim-to-full-text matching challenges; pivoted to abstract-based extraction when full-text unavailable.
+  - Explored converting the NLP pipeline into a standalone MCP server for better modularity.
+
+#### Natural Language Inference (NLI) Implementation
+- Implemented NLI feature.
+- Addressed chunking challenges: direct NLI implementation on chunks produced noisy results due to high maximum label probabilities across all chunks.
+- **Solution:** Applied similarity-weighted label probabilities to reduce noise by incorporating semantic relevance.
+- Tested and validated which chunks were being selected for inference to ensure quality.
+
+#### Semantic Similarity & Search
+- Implemented semantic similarity scoring between claims and evidence text (sbert).
+- Integrated similarity metrics as weights for NLI probability adjustments.
+
+#### MCP (Model Context Protocol) Integration & Tooling
+- Documented MCP issues and current usage patterns in README for future reference.
+
+#### Code Organization & Pipeline Integration
+- Merged search functionality with Lun's demo code.
+
+#### Data Integration
+- Pulled CIVIC (Clinical Interpretation of Variants in Cancer) dataset to expand ground truth sources beyond SIGNOR.
+
+### Job Search
+
+#### Job Applications
+- Applied to NVIDIA Solutions Architect position.
+- Researched and identified all bio-related foreign company opportunities for batch applications.
+
+#### Resume & Portfolio Development
+- **Resume Redesign:**
+  - Created single-page concise resume following colleague Peter's advice.
+  - Designed hyperlink structure: single-page resume links to full-access comprehensive CV.
+  - Established portfolio website location for hosting complete CV with detailed project descriptions.
+- **Core Positioning Statement:**
+  - Refined value proposition: "I am a research talent with a PhD in mathematical modeling and hands-on experience developing LLM Agent systems at a top UK institution."
+  - Emphasized dual expertise in quantitative modeling and practical AI/LLM development.
+
 ## 260213 ##
 
 ### Agent GRN correction
 
 ### Context sufficiency classifier
 - Made a flowchart for my idea of training a MLP sufficiency classifier, https://drive.google.com/file/d/1pLIBPBI9ME5U7nix1u9IrXqaxH2oESU4/view?usp=sharing.
-- Made an md file for my idea of each features' definition and way of calculation. 
+- Made an md file for my idea of each features' definition and way of calculation.
 
 #### Paper Writing & Table Updates
 - Reviewed and addressed Lun's comments on the club PPT slides. The final PPT is in https://drive.google.com/file/d/1hGqr3jwAsMW0Q2eJT2OAuy41akz96D8c/view?usp=sharing
@@ -97,55 +152,55 @@
 
 ### Agent GRN correction
 
-**Data Preparation & Ground Truth**  
-- Re‑calculated accuracy using Aurelian’s ground‑truth data and updated the corresponding labels.  
-- Moved generated answer files to new directories, True Negative to True Positive:  
-  - `qa_comprehensive/full_text/rater`  
-  - `qa_comprehensive/full_text/shuffled`  
-  - `qa/gpt-oss-20b` & `qa/gpt-oss-120b`  
-  - `data/papers/signor` & `data/papers/qa_search/`  
-  - `langgraph/results/reasoning/glm-4.6/no_search/false_edges`  
-- Re‑computed accuracy metrics and experimented with different decision thresholds for GNN model (0.01 → 0.5).  
+**Data Preparation & Ground Truth**
+- Re‑calculated accuracy using Aurelian's ground‑truth data and updated the corresponding labels.
+- Moved generated answer files to new directories, True Negative to True Positive:
+  - `qa_comprehensive/full_text/rater`
+  - `qa_comprehensive/full_text/shuffled`
+  - `qa/gpt-oss-20b` & `qa/gpt-oss-120b`
+  - `data/papers/signor` & `data/papers/qa_search/`
+  - `langgraph/results/reasoning/glm-4.6/no_search/false_edges`
+- Re‑computed accuracy metrics and experimented with different decision thresholds for GNN model (0.01 → 0.5).
 
-**Model Evaluation & Accuracy Analysis**  
-- Ran evaluations for:  
-  - GPT‑OSS‑20b & GPT‑OSS‑120b (re‑run required)  
-  - GLM‑4.6 (no‑search mode)  
-  - Signor baseline  
-  - GNN models (added performance metrics and analysis code)  
-- Identified issues:  
-  - Macro‑F1 inconsistencies (perfect predictions yield 0.5).  
-  - High proportion of NaN or “I don’t know” answers causing low accuracy (overall acc ≈ 0.13).  
-  - Specific problematic edges (e.g., `BMI1_H2AX_up‑regulates`, `AURKA_AR`, `GNAO1_ADCY1_down‑regulates`).  
-  - Evidence‑support analysis revealed many negatives lack any supporting literature; treating NaN as False raises performance to > 0.8.  
-- Recorded benchmark accuracies:  
-  - Rater accuracy = 0.81  
-  - Random baseline accuracy = 0.875  
-- Token‑usage audit for GPT‑OSS‑120b (max 128k):  
-  - One file (`CDK1_AR_up‑regulates.json`, 130 k tokens) exceeded limit → error.  
-  - Overall token stats: min ≈ 8 k, max ≈ 90 k, mean ≈ 50 k, median ≈ 51 k.  
+**Model Evaluation & Accuracy Analysis**
+- Ran evaluations for:
+  - GPT‑OSS‑20b & GPT‑OSS‑120b (re‑run required)
+  - GLM‑4.6 (no‑search mode)
+  - Signor baseline
+  - GNN models (added performance metrics and analysis code)
+- Identified issues:
+  - Macro‑F1 inconsistencies (perfect predictions yield 0.5).
+  - High proportion of NaN or "I don't know" answers causing low accuracy (overall acc ≈ 0.13).
+  - Specific problematic edges (e.g., `BMI1_H2AX_up‑regulates`, `AURKA_AR`, `GNAO1_ADCY1_down‑regulates`).
+  - Evidence‑support analysis revealed many negatives lack any supporting literature; treating NaN as False raises performance to > 0.8.
+- Recorded benchmark accuracies:
+  - Rater accuracy = 0.81
+  - Random baseline accuracy = 0.875
+- Token‑usage audit for GPT‑OSS‑120b (max 128k):
+  - One file (`CDK1_AR_up‑regulates.json`, 130 k tokens) exceeded limit → error.
+  - Overall token stats: min ≈ 8 k, max ≈ 90 k, mean ≈ 50 k, median ≈ 51 k.
 
-**Paper Search & QA Pipeline Enhancements**  
-- Refactored `QA_paper_search.py`:  
-  - Improved PDF download routine (`download_pdf_from_doi`) and added retry logic for missing papers.  
-  - Made search strings configurable to broaden queries; target = 5 papers per question.  
-  - Ensured search results are stored in `true_negative` and `true_positive` folders.  
-  - Added support for loading Signor edges and moved core functions to `src` after verification.  
-- Debugged path issues preventing PDF downloads; resumed full edge‑wise paper search.  
-- Executed sufficient‑support test on 495 papers (≈ 379 min 34.9 s).  
+**Paper Search & QA Pipeline Enhancements**
+- Refactored `QA_paper_search.py`:
+  - Improved PDF download routine (`download_pdf_from_doi`) and added retry logic for missing papers.
+  - Made search strings configurable to broaden queries; target = 5 papers per question.
+  - Ensured search results are stored in `true_negative` and `true_positive` folders.
+  - Added support for loading Signor edges and moved core functions to `src` after verification.
+- Debugged path issues preventing PDF downloads; resumed full edge‑wise paper search.
+- Executed sufficient‑support test on 495 papers (≈ 379 min 34.9 s).
 
-**Additional Findings & Resources**  
-- Noted relevant literature: *Language Agents Achieve Superhuman Synthesis of Scientific Knowledge* (arXiv:2409.13740).  
+**Additional Findings & Resources**
+- Noted relevant literature: *Language Agents Achieve Superhuman Synthesis of Scientific Knowledge* (arXiv:2409.13740).
 
 - **Research & Reading**
   - Reviewed documentation and tutorials:
-    - “How to implement tool use” (Claude platform)
+    - "How to implement tool use" (Claude platform)
     - Claude Agent SDK tutorial (Claude Sonnet 4.5)
     - Agent Skills in the SDK
     - OpenRouter Zero Data Retention and Logging
     - Web Reader MCP Server
   - Read and annotated papers:
-    - *FuseLinker: Leveraging LLM’s pre‑trained text embeddings…*
+    - *FuseLinker: Leveraging LLM's pre‑trained text embeddings…*
     - *GOFlowLLM – curating miRNA literature…*
     - *An Evidence‑Grounded Research Assistant for Functional Genomics…*
     - *On Evaluating LLM Alignment by Evaluating LLMs as Judges*
@@ -156,10 +211,10 @@
 - **SDK / Tool Integration**
   - Integrated Claude SDK with GLM, search (https://github.com/anthropics/life-sciences), and custom skill modules
   - Implemented Claude SDK + GLM and tested the web‑search plugin
-  - Added and exercised the “Answer a single TRUE or FALSE…” skill
+  - Added and exercised the "Answer a single TRUE or FALSE…" skill
   - Connected GLM to MCP web‑reader; experimented with PubMed/PMC plugin
   - Checked SDK tool‑call responses and token‑usage reporting
-  - Verified Claude SDK token usage with claude-3.5 (input 9k‑68k, output 50‑2.8k, cache 7k‑571k)
+  - Verified Claude SDK token usage with claude-3.5 (input 9k‑68k, output 50‑2.8k, cache 7k‑571k)
 
 - **Prompt Engineering & Skill Evaluation**
   - Compared official Claude skill vs. prompt‑engineering across 10 runs. The performance is similar, but the official skill is more time efficient.
@@ -188,43 +243,43 @@
   - Updated Git repository with latest code and documentation
 
 - **Writing & Documentation**
-  - Integrated “Lost in the Maze” into the Introduction’s related work section
+  - Integrated "Lost in the Maze" into the Introduction's related work section
   - Added citations for additional frameworks
 
 - **Miscellaneous**
   - Consulted Gemini about script placement and QA integration decisions
   - Asked Antigravity about GLM webReader parameter tuning for retraction detection
-  - Explored “BrowseComp → multi‑hop QA” and “Humanity’s Last Exam” concepts
+  - Explored "BrowseComp → multi‑hop QA" and "Humanity's Last Exam" concepts
   - Investigated differences between SEARCH‑O1 and related approaches.
 
 ### 求職
 
 - **Job search preparation**
-  - Queried potential job openings I could apply for  
-  - Gathered recommendations from 104 and LinkedIn  
+  - Queried potential job openings I could apply for
+  - Gathered recommendations from 104 and LinkedIn
 
 - **Resume / CV revision**
-  - Integrated vaccine paper into CV and LinkedIn 
-  - Revised CV using Jose’s resume as a template
-  - Reviewed Jose’s resume for inspiration  
-  - Added useful items, removed skills I don’t yet have  
-  - Highlighted work in Saez Lab and PhD credential  
-  - Decided on title phrasing (computational biology vs. leading with PhD)  
-  - Completed final proof‑read of the resume  
+  - Integrated vaccine paper into CV and LinkedIn
+  - Revised CV using Jose's resume as a template
+  - Reviewed Jose's resume for inspiration
+  - Added useful items, removed skills I don't yet have
+  - Highlighted work in Saez Lab and PhD credential
+  - Decided on title phrasing (computational biology vs. leading with PhD)
+  - Completed final proof‑read of the resume
 
 - **LinkedIn profile updates**
-  - Updated “About” section and overall profile content  
-  - Added CovSyn paper to LinkedIn  
-  - Aligned LinkedIn details with the revised CV  
-  - Modified 104 job‑portal posting accordingly  
+  - Updated "About" section and overall profile content
+  - Added CovSyn paper to LinkedIn
+  - Aligned LinkedIn details with the revised CV
+  - Modified 104 job‑portal posting accordingly
 
 - **Research / project documentation**
-  - Summarized concrete outcomes of my research projects  
-  - Compiled EBI and LLM‑related keywords  
+  - Summarized concrete outcomes of my research projects
+  - Compiled EBI and LLM‑related keywords
 
 - **Final checks & communication**
-  - Performed overall quality check of all materials  
-  - Sent the updated resume/CV/LinkedIn information back to the recruiter/headhunter  
+  - Performed overall quality check of all materials
+  - Sent the updated resume/CV/LinkedIn information back to the recruiter/headhunter
 
 ### Learning
 
@@ -237,113 +292,113 @@
   - Removed duplicate content
   - Updated figure, table, and algorithm references
   - Corrected references to the supplementary material in the main text
-  - Proofread the supplementary document  
+  - Proofread the supplementary document
 
 - **Main Text**
   - Fixed supplementary references within the main manuscript
-  - Performed proof‑reading of the main text  
+  - Performed proof‑reading of the main text
 
 ## 251214 ##
 
 ### Agent GRN correction
 
-### Token Usage & Semantic Search  
-- Analyzed token usage for loaded questions and contexts; generated a token usage report (67 papers, avg 20,826 tokens, max 60,365 tokens).
-- Identified 63 files > 8 k tokens and 9 files > 32 k tokens.  
+### Token Usage & Semantic Search
+- Analyzed token usage for loaded questions and contexts; generated a token usage report (67 papers, avg 20,826 tokens, max 60,365 tokens).
+- Identified 63 files > 8 k tokens and 9 files > 32 k tokens.
 - Re‑checked semantic‑search capabilities and documented the type of information it can provide. It cannot provide full-text nor the pdf download. But it can provide the llm short summary.
 
-### Model Evaluation & Metrics  
-- Removed `NaN` values from TP, TN, FP, and FN calculations while keeping total edge count.  
-- Re‑ran context‑window experiments after tweaking the “sufficient context” prompt.  
-- Confirmed macro‑F1 calculation is correct.  
-- Summarized key insights from previous results, including:  
-  - Abstract + title sufficiency is lower than full‑text; only ~50 % of edges are sufficiently supported by full‑text.  
-  - True‑negative edges often lack sufficient references, maybe explaining why they were removed in Signor.  
-  - The 20B model performs better on true‑negative edges because it frequently answers “I don’t know.”  
+### Model Evaluation & Metrics
+- Removed `NaN` values from TP, TN, FP, and FN calculations while keeping total edge count.
+- Re‑ran context‑window experiments after tweaking the "sufficient context" prompt.
+- Confirmed macro‑F1 calculation is correct.
+- Summarized key insights from previous results, including:
+  - Abstract + title sufficiency is lower than full‑text; only ~50 % of edges are sufficiently supported by full‑text.
+  - True‑negative edges often lack sufficient references, maybe explaining why they were removed in Signor.
+  - The 20B model performs better on true‑negative edges because it frequently answers "I don't know."
 - Generated sufficient test pie chart. Also generated the associated accuracy test.
 
-### Prompt & Query Engineering  
+### Prompt & Query Engineering
 - Refined `convert_question_to_query` prompt (initially returned poor synonyms); asked Claude for improvements.
-- Updated `construct_signor_question` to focus on “A activates B” / “A inhibits B.”  
-- Tested the sufficiency prompt on 10 papers – all judged insufficient; iterated on wording.  
-- Explored integrating skill‑related information into prompts to improve answer quality.  
-- Adjusted temperature and QA prompts for more consistent responses.  
+- Updated `construct_signor_question` to focus on "A activates B" / "A inhibits B."
+- Tested the sufficiency prompt on 10 papers – all judged insufficient; iterated on wording.
+- Explored integrating skill‑related information into prompts to improve answer quality.
+- Adjusted temperature and QA prompts for more consistent responses.
 - Implemented the rater function.
 
-### Sufficiency Experiments  
-- Evaluated AU‑Cite papers for sufficiency; most should be sufficient, but many returned insufficient, indicating prompt issues.  
-- Tested specific gene pairs (e.g., MAP2K1 ↔ PPARG, MAP2K1 ↔ PPARG via phosphorylation) to see how phrasing affects sufficiency scores.  
-- Ran opposite‑direction queries (e.g., BRAF ↔ MAP2K1) and confirmed the model can correctly output “No” when appropriate.  
-- Identified cases where the model answered “No” but reported sufficiency = 0; refined the sufficiency prompt accordingly.  
+### Sufficiency Experiments
+- Evaluated AU‑Cite papers for sufficiency; most should be sufficient, but many returned insufficient, indicating prompt issues.
+- Tested specific gene pairs (e.g., MAP2K1 ↔ PPARG, MAP2K1 ↔ PPARG via phosphorylation) to see how phrasing affects sufficiency scores.
+- Ran opposite‑direction queries (e.g., BRAF ↔ MAP2K1) and confirmed the model can correctly output "No" when appropriate.
+- Identified cases where the model answered "No" but reported sufficiency = 0; refined the sufficiency prompt accordingly.
 
-### Web Search Agent Development  
-- Designed a web‑search agent (based on `fetch_signor_paper_details.py`) to retrieve relevant papers:  
-  - Converts user prompts into optimized PubMed search strings.  
-  - Generates a specified number of search results (e.g., 10 papers).  
-  - Handles cases where no paper is found: pauses for user decision (manual upload vs. skip).  
-- Implemented workflow options: **manual mode** (user supplies PDFs) and **auto mode** (agent attempts full‑text retrieval; if unavailable, sets `full_text = None`).  
-- Verified that Claude cannot access full‑text behind paywalls; limited the agent to open‑access sources.  
+### Web Search Agent Development
+- Designed a web‑search agent (based on `fetch_signor_paper_details.py`) to retrieve relevant papers:
+  - Converts user prompts into optimized PubMed search strings.
+  - Generates a specified number of search results (e.g., 10 papers).
+  - Handles cases where no paper is found: pauses for user decision (manual upload vs. skip).
+- Implemented workflow options: **manual mode** (user supplies PDFs) and **auto mode** (agent attempts full‑text retrieval; if unavailable, sets `full_text = None`).
+- Verified that Claude cannot access full‑text behind paywalls; limited the agent to open‑access sources.
 
-### Additional Investigations   
-- Explored using the Semantic Scholar API for article summaries (checked DOI 10.1126/science.1106148).  
-- Considered a LangGraph‑based orchestration but decided against it after discussion with Antigravity.  
-- Planned future work to specify interaction types more explicitly when needed.  
+### Additional Investigations
+- Explored using the Semantic Scholar API for article summaries (checked DOI 10.1126/science.1106148).
+- Considered a LangGraph‑based orchestration but decided against it after discussion with Antigravity.
+- Planned future work to specify interaction types more explicitly when needed.
 
 ## 251207 ##
 
 ### Agent GRN correction
 
 **Prompt & Rater Development**
-- Wrote the rater prompt.  
-- Tested the prompt with title + abstract inputs.  
-- Explored the “A → B then B → A” scenario to see if the rater still marks sufficiency.  
-- Added a three‑option answer format (Yes / No / Unsure) and defined how “Unsure” is treated (as a negative answer).  
+- Wrote the rater prompt.
+- Tested the prompt with title + abstract inputs.
+- Explored the "A → B then B → A" scenario to see if the rater still marks sufficiency.
+- Added a three‑option answer format (Yes / No / Unsure) and defined how "Unsure" is treated (as a negative answer).
 
 **Sufficiency Experiments**
-- Ran the BCL2L1 → BAD query on two randomly selected papers: one truly about the pair and one about BCL2L10 / BAD; Claude correctly identified the relevant paper.  
-- Confirmed that title + abstract alone are insufficient, while full‑text more likely provides sufficient context using claude 4.5.  
-- Noted that a PubMed paper not indexed in OminiPath is inherently insufficient.  
+- Ran the BCL2L1 → BAD query on two randomly selected papers: one truly about the pair and one about BCL2L10 / BAD; Claude correctly identified the relevant paper.
+- Confirmed that title + abstract alone are insufficient, while full‑text more likely provides sufficient context using claude 4.5.
+- Noted that a PubMed paper not indexed in OminiPath is inherently insufficient.
 
 **Data Collection & Preparation**
-- Collected ~10 papers via a custom web‑search method; verified each has a full abstract.  
-- Identified that many Signor entries have PMID but lack PMCID, limiting full‑text access.  
+- Collected ~10 papers via a custom web‑search method; verified each has a full abstract.
+- Identified that many Signor entries have PMID but lack PMCID, limiting full‑text access.
 
 **Paper Retrieval Pipeline**
-- Designed a three‑step retrieval strategy:  
-  1. PDF extraction (if local PDF exists)  
-  2. PMC full‑text (if PMCID available)  
-  3. Jina AI lookup (using DOI or PubMed URL)  
+- Designed a three‑step retrieval strategy:
+  1. PDF extraction (if local PDF exists)
+  2. PMC full‑text (if PMCID available)
+  3. Jina AI lookup (using DOI or PubMed URL)
 - Implemented PDF downloading code using paper-search-mcp. But it is incompleted. For now, I still need to do manual downloading. PubMed api doesn't provide pdf download option.
 
 **Code Development & Integration**
 - Structured my repository.
 
 **Evaluation & Scoring**
-- Loaded the Signor dataset, retrieved titles, abstracts, and full texts, and computed sufficiency scores for all papers.  
+- Loaded the Signor dataset, retrieved titles, abstracts, and full texts, and computed sufficiency scores for all papers.
 - Plot pie chart for comparing sufficient support when only title/abstract provided or full text provided.
-- Compared results for true‑negative edges (title + abstract vs. full text) and true‑positive edges. 
-- Defined accuracy calculation: predictions of “Unsure”, `NaN` is treated as negative (No answer).  
+- Compared results for true‑negative edges (title + abstract vs. full text) and true‑positive edges.
+- Defined accuracy calculation: predictions of "Unsure", `NaN` is treated as negative (No answer).
 - Generated few tables for metrics comparison in different conditions. Also compared the prediction result of gpt-oss-20b and gpt-oss-120b.
 
-**Infrastructure & Miscellaneous** 
-- Planned incorporation of VisDoM for future analyses.  
-- Reviewed the `paper-qa` repository as a potential component for upcoming RAG implementations.  
+**Infrastructure & Miscellaneous**
+- Planned incorporation of VisDoM for future analyses.
+- Reviewed the `paper-qa` repository as a potential component for upcoming RAG implementations.
 
 ## 251128 ##
 
 ### Agent GRN correction
 
-**Flash Talk & Presentation**  
-- Sent the flash PPT and 4‑month progress materials (11/26).  
-- Adjusted fonts and grammar using Gemini; performed final proofreading.  
+**Flash Talk & Presentation**
+- Sent the flash PPT and 4‑month progress materials (11/26).
+- Adjusted fonts and grammar using Gemini; performed final proofreading.
 
-**GNN Development & Evaluation**  
-- Set up Git: committed important files, created a new branch for GNN work.  
-- Installed PyTorch and developed `gnn_train_signor.py`.  
-- Processed protein‑protein interaction data: extracted, de‑duplicated, and stored true‑negative edges.  
-- Defined workflow: use existing true positives/negatives as the test set; train with random positive edge addition (aligned with Aaron’s method).  
-- Ensured training graphs exclude test‑set edges.  
-- Trained models; best checkpoint at epoch 232 (Validation AUC 0.85, Test AUC 0.3902, Test F1 0.7593).   
+**GNN Development & Evaluation**
+- Set up Git: committed important files, created a new branch for GNN work.
+- Installed PyTorch and developed `gnn_train_signor.py`.
+- Processed protein‑protein interaction data: extracted, de‑duplicated, and stored true‑negative edges.
+- Defined workflow: use existing true positives/negatives as the test set; train with random positive edge addition (aligned with Aaron's method).
+- Ensured training graphs exclude test‑set edges.
+- Trained models; best checkpoint at epoch 232 (Validation AUC 0.85, Test AUC 0.3902, Test F1 0.7593).
 - Fixed AUC‑ROC calculation (added proper threshold handling); verified curve shape and averaged results over 10 runs before plotting.
 - Generated prediction plots for all models.
 
@@ -440,28 +495,28 @@ Model saved to: best_gnn_model.pth
 
 </details>
 
-**Literature Review & Paper Management**  
-- Reviewed papers and scanned recent NeurIPS & ICLR proceedings.  
-- Read and summarized:  
-  - *Can LLMs be Good Graph Judge for Knowledge Graph Construction?* (arXiv:2411.17388)  
+**Literature Review & Paper Management**
+- Reviewed papers and scanned recent NeurIPS & ICLR proceedings.
+- Read and summarized:
+  - *Can LLMs be Good Graph Judge for Knowledge Graph Construction?* (arXiv:2411.17388)
   - *Harnessing Diverse Perspectives: A Multi‑Agent Framework for Enhanced Error Detection in Knowledge Graphs* (arXiv:2501.15791)
   - *SUFFICIENT CONTEXT: A NEW LENS ON RETRIEVAL‑AUGMENTED GENERATION SYSTEMS* (arXiv:2411.06037)
 - Our project aligns more with multi‑document QA/evidence aggregation than multi‑hop QA.
 - 看起來是可以當作取代我現在relavancy test的prompt，這篇基本上是純粹用prompt enfineering，換句話說，把他的prompt應用在我的agent上基本就完了，那麼現在的問題是我要如何找到sufficient prompt，在我知道現在prompt不是sufficient prompt時我該怎麼做 -> prompt裡面有explaination這段，所以以可以用explaination的回答來更新prompt做迭代，比方說explaination說年份資訊不足，那麼我就可以回去prompt說要找年份 -> 我現在在考慮Lun說的comment，refine PKN真的該被當成multi-hop QA嗎 -> 我最後傳給Lun: Thanks for sharing the paper; it was an interesting read. I've been thinking that our GRN refinement task might not actually be multi-hop QA. If I understand correctly, multi-hop QA requires chaining sequential facts from the context to derive an answer. For example, to answer whether "A affects C," one might need to connect the facts "A->B" and "B->C" (like an A->B->C chain). In our case, the process seems more parallel. We are verifying a single link (A->B) by gathering multiple pieces of supporting evidence simultaneously, which may sometimes contain conflicting information. I guess this aligns more with Multi-document QA or Evidence Aggregation?
-- Set up `paper-search-mcp` (searches arXiv, PubMed, bioRxiv, Semantic Scholar).  
-- Tested code to extract citation counts and other metadata; output JSON containing title, abstract, URL, journal, impact factor, citation number, etc.  
+- Set up `paper-search-mcp` (searches arXiv, PubMed, bioRxiv, Semantic Scholar).
+- Tested code to extract citation counts and other metadata; output JSON containing title, abstract, URL, journal, impact factor, citation number, etc.
 
-**Tooling & Environment Setup**  
-- Installed and configured:  
-  - Zotero for reference management.  
-- Backed up repository and experimental results.  
-- Used Antigravity to troubleshoot and fix code issues.  
+**Tooling & Environment Setup**
+- Installed and configured:
+  - Zotero for reference management.
+- Backed up repository and experimental results.
+- Used Antigravity to troubleshoot and fix code issues.
 
 ### CovSyn article
 
 - **Manuscript organization**
   - Copied the *Infectious Disease Modeling* manuscript into the project folder.
-  - Updated the manuscript to incorporate changes from Gemini 3.0.
+  - Updated the manuscript to incorporate changes from Gemini 3.0.
 
 - **Formatting & compliance**
   - Reformatted the document to meet IEEE style requirements for the *IEEE Journal of Biomedical and Health Informatics*.
@@ -475,7 +530,7 @@ Model saved to: best_gnn_model.pth
 
 - **Develop an automated LLM-driven reporting system**
   - Design and implement an LLM pipeline to process completed items from Taskade.
-  - Integrate the pipeline with Taskade’s API for real‑time data extraction.
+  - Integrate the pipeline with Taskade's API for real‑time data extraction.
   - Generate concise, human‑readable weekly reports in Markdown format.
 
 ## 251124 ##
@@ -496,7 +551,7 @@ Model saved to: best_gnn_model.pth
 
 - **Model development & training workflow**
   - Defined the true‑positive and true‑negative sets as the test dataset.
-  - Implemented a training pipeline similar to Aaron’s approach, using random positive edge addition.
+  - Implemented a training pipeline similar to Aaron's approach, using random positive edge addition.
   - Ensured that edges belonging to the test set were excluded from the training graph.
 
 - **Results**
@@ -509,8 +564,8 @@ Model saved to: best_gnn_model.pth
 - **Research & Reading**
   - [Reviewed *Recursive Language Models* article (Medium)](https://alexzhang13.github.io/blog/2025/rlm/)
   - Re‑read the Wikipedia paper on ranking methodology (clarify if ranking is based on confidence or text‑support matching)
-  - Studied Google Research “confidence” paper
-  - Examined KGValidator framework (arXiv 2404.15923) and evaluated its scope for future work. 看起來Lun他是非頂會或是頂刊的paper就不看，所以這篇不在他的考慮範圍。
+  - Studied Google Research "confidence" paper
+  - Examined KGValidator framework (arXiv 2404.15923) and evaluated its scope for future work. 看起來Lun他是非頂會或是頂刊的paper就不看，所以這篇不在他的考慮範圍。
   - Investigated edge‑validation cases (e.g., BCL2L1‑BAD, BMI1‑H2AX, PRKACA‑AKT2, ALOX5‑STAT5A) and differences in edge definitions (direct vs. indirect)
     - 也許false edges表現比較好的理由可能是因為我的edge問法太strict了嗎，所以比較容易回答false
     - 如果我給正確的reference給claude，然後問他一樣的問題，他會回答什麼 -> 答案還是不變
@@ -519,8 +574,8 @@ Model saved to: best_gnn_model.pth
         - 用用看claude的search，看他會cite哪篇，給出什麼答案，這個edge是signor在2020年加入的edge，後來刪掉了-> 結果signor反而是用2007年的paper
 
 - **Presentation Preparation**
-  - Loaded the PowerPoint deck and searched Google Drive for additional 1‑on‑1 PPT examples (found via “1‑on‑1” query)
-  - Determined presentation length: 25 min total → allocate ~10 min for discussion, target 15–20 slides
+  - Loaded the PowerPoint deck and searched Google Drive for additional 1‑on‑1 PPT examples (found via "1‑on‑1" query)
+  - Determined presentation length: 25 min total → allocate ~10 min for discussion, target 15–20 slides
 
 - **Planning**
   - Drafted a 3–4‑month roadmap, aiming for one major deliverable per month
@@ -529,11 +584,11 @@ Model saved to: best_gnn_model.pth
 - **Experimental & Validation Work**
   - Set up codebase capable of running large‑scale simulations
   - Investigated why certain LLM queries are flagged as problematic
-  - Verified “true edge” cases and analyzed false‑edge performance (possible over‑strict query formulation)
+  - Verified "true edge" cases and analyzed false‑edge performance (possible over‑strict query formulation)
   - Compared ground‑truth tables for AU dataset
   - Tested Claude with correct references to see answer consistency
-  - Analyzed GLM‑4.6’s poorer performance on false edges
-  - Ran Claude’s web‑search mode on edges that all models answered “true” (e.g., BCL2L1‑BAD → Signor 2000 paper)
+  - Analyzed GLM‑4.6's poorer performance on false edges
+  - Ran Claude's web‑search mode on edges that all models answered "true" (e.g., BCL2L1‑BAD → Signor 2000 paper)
   - Checked citation behavior: Claude cited a 2007 paper for a 2020 Signor edge that was later removed
 
 - **Miscellaneous Tasks**
@@ -690,7 +745,7 @@ Model saved to: best_gnn_model.pth
         1. I tested if I can do llama.cpp strcutured output + logprobs. It turns out structured output does not support logprobs. Logprobs only works on pure text syntax.
         1. I also tried using two llm response approach. I first asked llm to think about the question and save the response in reasoning. Then I input the reasoning to llm and ask it to answer the question with only True or False. I also tried the ICL approach but the llm just can't generate single True/False answer so I decide to abandon this approach.
         1. Then I decided to use only ask llm once and then get the answering text token and get its' logprobs.
-            1. Find the answer sentence.        
+            1. Find the answer sentence.
             1. Find the answer token in the anser sentence.
         1. Debugged llm repeating. I add prompt "First provide your reasoning, then on a new line write "Answer: Yes" or "Answer: No"".
     1. I was thinking using only confidence score does't make it as an agent. Because there is no llm participant in controlling the flow.
@@ -698,9 +753,9 @@ Model saved to: best_gnn_model.pth
     1. Implemented the reflect_node for doing it. Now I set the confidence score 0.9 and relevance 0.7 as threshold.
     1. Generate a case that generate uncertain answer.
     1. Check if the agent can generate logprob, yes: 0.5 and No: 0.5 answer.
-    1. Check Tavilysearch vs Searxng. The Searxng is free. For Tavily: 
-        - 1,000 credits/month - Free. 
-        - 4,000 credits/month - $30 ($0.0075/credit). 
+    1. Check Tavilysearch vs Searxng. The Searxng is free. For Tavily:
+        - 1,000 credits/month - Free.
+        - 4,000 credits/month - $30 ($0.0075/credit).
         - Pay-as-you-go: $0.008/credit.
         - Basic search: 1 credit per request
         - Advanced search: 2 credits per request
@@ -805,7 +860,7 @@ Model saved to: best_gnn_model.pth
 1. Check [Predicting transcriptional outcomes of novel multigene perturbations with GEARS](https://www.nature.com/articles/s41587-023-01905-6)
 1. CovSyn
     1. Setup mac Latex.
-    1. Presented CovSyn as a first step in a framework for benchmarking of epidemiological models and the current model as a first example of a highly specialised model demonstrating synthesis of an extreme case of COVID-19, i.e. Taiwan's first outbreak. 
+    1. Presented CovSyn as a first step in a framework for benchmarking of epidemiological models and the current model as a first example of a highly specialised model demonstrating synthesis of an extreme case of COVID-19, i.e. Taiwan's first outbreak.
     1. Stated that the aim of this framework is to enable systematic exploration of the linkage between data, modelling, analytics, and policy.
     1. Added the mata analysis article in our cover letter.
     1. Changed title to CovSynTW20: an agent-based model for synthesizing Taiwanese COVID-19 2020 course of disease and contact tracing data.
@@ -865,7 +920,7 @@ Model saved to: best_gnn_model.pth
     1. Debugged Roven's code.
     1. Read https://stefvanbuuren.name/fimd/sec-pmm.html
 
-    
+
 
 ## 250825 ##
 
@@ -890,7 +945,7 @@ Model saved to: best_gnn_model.pth
         1. Randomly add edges
         1. Implemented code for converting edge list to networkx to text llm input.
         1. Designed the new prompt.
-        1. Check if the Biomni corrected network has cycle. The anser is yes.   
+        1. Check if the Biomni corrected network has cycle. The anser is yes.
         1. Calculated the recovery precision, recall, and f1 score.
         1. I have done 30 times repeats and save the result.
         1. Plot the violin plot for the metrics.
