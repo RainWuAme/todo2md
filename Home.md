@@ -1,3 +1,38 @@
+## 260227 ##
+
+### Agent GRN correction
+
+#### MLP Classifier Development
+- Trained MLP classifier for context sufficiency.
+- Addressed class imbalance: Original 378 y=1, 88 y=0 → Balanced 378 y=1, ~378 y=0 using combinatorial conflict paper approach and noise augmentation.
+- Initial model predicted only class sufficient=1; resolved through data balancing.
+- Model selection. So far the 2 layer MLP perform the best.
+
+#### Dataset & Data Processing
+- Decided to use SciFact-Open dataset.
+- Investigated CIVISC data.
+- Fixed SciFact-Open data issues: many evidence IDs didn't map to papers due to extraction method; resolved by using official zip file.
+- Confirmed dataset contains 15 negative conflict samples.
+- Switched from MCP + title search to Biopython Entrez for PMID retrieval (avoids token costs).
+
+#### Feature Engineering & Model Optimization
+- Implemented feature selection.
+- Tested logistic regression as baseline.
+- Implemented aggregation logic for multi-paper features.
+- Defined default feature values for cases without full-text.
+- Data augmentation: randomly added 1~3 irrelevant papers per sample.
+
+#### Code Implementation
+- Implemented `generate_classifier_data` function.
+- Developed inference code for trained classifier.
+- Pushed PyTorch classifier model (.pth) to Git.
+- Documented classifier mathematical formulation.
+
+### Job Search
+
+#### Applications
+- Applied to multiple positions: Appier (Senior ML Scientist), Veeva (LLM), OpenData APAC (Algorithm Engineer), NVIDIA (Solutions Architect JR2013107), AMD (Software Development Engineer).
+
 ## 260221 ##
 
 ### Agent GRN correction
