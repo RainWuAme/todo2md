@@ -1,3 +1,33 @@
+## 260306 ##
+
+### Agent GRN correction
+
+#### Literature Review & Planning
+- Read "Recursive Language Models" and took notes for paper inclusion.
+- Read "Agentic Context Engineering: Evolving Contexts for Self-Improving Language Models".
+- Planned validation for `negative_conflict` labels and discussed handling strategies with Claude (via Claude Code and Web).
+- Decided to define `tau` as a hyperparameter and planned ablation tests for different `tau` values.
+- Tested the ablation test. I split the data into train/validate/test. There is some problem here. The test set I used does not contain any conflict case because we actually doesn't have ground truth of conflict cases. So the final ablation results show that the performance is the best while there is no conflict cases in the training data. This make sense since the model can perform the best when the training data distribution is similar to the test data distribution.
+- Drafted and refined a plan specifically targeting `negative_conflict` cases, reviewing agent-generated codes to ensure correctness.
+
+#### Implementation & Data Processing
+- Confirmed the new data generation code correctly records original SciFact-Open labels.
+- Rechecked `negative_conflict_ratio_analysis` to ensure accurate data classification and modified the code accordingly.
+- Adjusted code to cover more cases with various `tau` values (e.g., 3S:2C).
+
+#### Evaluation & Testing
+- Used Antigravity to test a 12S:1C case to determine if the LLM judges it as sufficient.
+- Tested multiple ratios (1S:1C, 2S:1C, 3S:1C, 5S:1C, and 12S:1C); Gemini 3.1 considered most as sufficient, except 3S:1C ID202 (scored 0).
+- Evaluated the text classifier on 3S:1C ID202, resulting in an output of 1 (p=0.68).
+- Reran `tau` ablation tests and also tested the performance of relabeling all data.
+- Concluded that an LLM is still necessary for making the final sufficiency verdict if we really want to capture the negative conflict cases in training.
+- After discussion, we decided to treat `tau` entirely as a hyperparameter, leaving final performance evaluation to the end-to-end LLM agent. We now should focus on merging the classifier into the main framework.
+
+### Job Search
+
+#### Applications
+- Applied for the Senior AI Algorithms Software Engineer (Time Series/Forecasting) role at NVIDIA.
+
 ## 260227 ##
 
 ### Agent GRN correction
