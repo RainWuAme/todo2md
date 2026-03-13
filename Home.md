@@ -1,3 +1,55 @@
+## 260313 ##
+
+### Agent GRN correction
+
+#### Writing & Documentation
+- Updated SIGNOR data paper description.
+- Documented the sufficiency classifier and implementation details.
+- Uploaded final documentation to Overleaf.
+
+#### Code Integration & Debugging
+- Pulled Lun's branch and reviewed the code.
+- Removed `entity_overlap_ratio` feature.
+- Tested simple single-claim classifier to verify basic functionality.
+- Debugged YAML configuration - found NLP-related features not working.
+- Identified that NLI-related feature extraction had bugs preventing execution.
+- Found that NLP features were not implemented in the tool interface.
+- Reran the agent after NLP feature integration.
+
+#### NLP & Text Processing Features
+- Added NLP feature extraction capability.
+- Discovered sufficiency was very low despite NLP features - investigated root cause.
+- Found too many papers lacking full-text was a major issue.
+- Updated system to use abstracts when full-text is unavailable (previously abstracts weren't used at all).
+- Checked if current mechanism removes irrelevant papers - found it currently doesn't.
+
+#### Web Search & Agent System
+- Discovered code currently only outputs `SUFFICIENT_SUPPORT` and `INSUFFICIENT`, but `SUFFICIENT_REFUTE` exists in code but isn't actually generated - requires debugging.
+- Identified why agent has problems creating LLM calls.
+- Re-implemented `make_llm` function - sub-agent was using text format which is error-prone.
+
+#### Classifier Development
+- Defined classifier requirements clearly - `tau` parameter should only be useful in conflict cases.
+- Wrote main classifier method in the paper.
+- Debugged `llm()` function issues.
+- Addressed Jupyter notebook printing excessive Qwen thinking text.
+- Debugged sufficiency issues - currently outputting too many `insufficient` results.
+- Tested with higher tau threshold - tried `tau = 0.5`.
+- Suspected classifier was receiving too many neutral papers.
+- Tested classifier with only support/refute papers (excluding neutral).
+- Confirmed that with only one relevant paper, system immediately marks as sufficient - tested ways to require at least 3 papers before iterating.
+
+#### Evaluation & Analysis
+- Reviewed yesterday's results - found a interesting uncertain claim case where agent detected Qwen wasn't doing its job and manually read articles to extract facts.
+
+### Job Search
+
+#### Applications
+- Applied for AICS position.
+- Waited for Martin's email before deciding whether to apply to Taiwan AI Labs.
+- Followed up with NVIDIA on previous application with no response.
+- Inquired about application status and missing materials.
+
 ## 260306 ##
 
 ### Agent GRN correction
@@ -567,7 +619,7 @@ Model saved to: best_gnn_model.pth
   - *Harnessing Diverse Perspectives: A Multi‑Agent Framework for Enhanced Error Detection in Knowledge Graphs* (arXiv:2501.15791)
   - *SUFFICIENT CONTEXT: A NEW LENS ON RETRIEVAL‑AUGMENTED GENERATION SYSTEMS* (arXiv:2411.06037)
 - Our project aligns more with multi‑document QA/evidence aggregation than multi‑hop QA.
-- 看起來是可以當作取代我現在relavancy test的prompt，這篇基本上是純粹用prompt enfineering，換句話說，把他的prompt應用在我的agent上基本就完了，那麼現在的問題是我要如何找到sufficient prompt，在我知道現在prompt不是sufficient prompt時我該怎麼做 -> prompt裡面有explaination這段，所以以可以用explaination的回答來更新prompt做迭代，比方說explaination說年份資訊不足，那麼我就可以回去prompt說要找年份 -> 我現在在考慮Lun說的comment，refine PKN真的該被當成multi-hop QA嗎 -> 我最後傳給Lun: Thanks for sharing the paper; it was an interesting read. I've been thinking that our GRN refinement task might not actually be multi-hop QA. If I understand correctly, multi-hop QA requires chaining sequential facts from the context to derive an answer. For example, to answer whether "A affects C," one might need to connect the facts "A->B" and "B->C" (like an A->B->C chain). In our case, the process seems more parallel. We are verifying a single link (A->B) by gathering multiple pieces of supporting evidence simultaneously, which may sometimes contain conflicting information. I guess this aligns more with Multi-document QA or Evidence Aggregation?
+- 看起來是可以當作取代我現在relavancy test的prompt，這篇基本上是純粹用prompt enfineering,換句話說，把他的prompt應用在我的agent上基本就完了，那麼現在的問題是我要如何找到sufficient prompt，在我知道現在prompt不是sufficient prompt時我該怎麼做 -> prompt裡面有explaination這段，所以以可以用explaination的回答來更新prompt做迭代，比方說explaination說年份資訊不足，那麼我就可以回去prompt說要找年份 -> 我現在在考慮Lun說的comment，refine PKN真的該被當成multi-hop QA嗎 -> 我最後傳給Lun: Thanks for sharing the paper; it was an interesting read. I've been thinking that our GRN refinement task might not actually be multi-hop QA. If I understand correctly, multi-hop QA requires chaining sequential facts from the context to derive an answer. For example, to answer whether "A affects C," one might need to connect the facts "A->B" and "B->C" (like an A->B->C chain). In our case, the process seems more parallel. We are verifying a single link (A->B) by gathering multiple pieces of supporting evidence simultaneously, which may sometimes contain conflicting information. I guess this aligns more with Multi-document QA or Evidence Aggregation?
 - Set up `paper-search-mcp` (searches arXiv, PubMed, bioRxiv, Semantic Scholar).
 - Tested code to extract citation counts and other metadata; output JSON containing title, abstract, URL, journal, impact factor, citation number, etc.
 
