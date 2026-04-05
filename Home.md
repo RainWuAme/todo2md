@@ -1,3 +1,49 @@
+## 260405 ##
+
+### Job Search
+- Contacted Taiwan AI Labs connections (Sean) and connected with Jose's AILabs friends on LinkedIn.
+- Prepared and updated my CV and 104 profile (also created an AI version).
+- Checked ASML, Microsoft, and Google job portals for AI positions.
+- Planned to apply to Taiwan AI Labs.
+- Simulated potential interview questions for "Attention Is All You Need".
+- Applied 鴻海 and 台達.
+
+### Agent GRN Correction
+
+#### Implementation & Debugging
+- Merged Lun's branch, debugged `setup_kernel`, and verified NLP model loading logic.
+- Debugged `render_sufficiency` and removed the `sufficient_suport` label.
+- Changed the final verdict option from insufficient to UNCERTAIN.
+- Handled text embedding issues (`en_core_sci_sm` fallback).
+- Tracked sufficiency trajectory by creating `get_sufficiency_history` and checking `EvidenceState`.
+- Reviewed and modified shell scripts (`run_signor_batch.sh`, `run_signor_eval.py`) for processing evaluations.
+- Debbugged execution speed: changed fact extraction to batching (`extract_and_add_facts_batch`), tested continuous batching, and determined which PMIDs lack `evidence_state.json`.
+- Tested the system without workflow instructions using a separate test repository.
+
+#### LLM Strategy & Model Configurations
+- Switched to using the Claude API for evaluation runs, managed subscriptions, and planned large-scale signor evaluations.
+- Evaluated `qwen3.5-9b` (no thinking) with `max_iter=4` and also tested Claude Haiku and GPT-OSS (20b/120b).
+- Addressed prompt strictness for Gemini where the LLM returned empty values if protein aliases didn't perfectly match GNAS/ADCY1 in the claim.
+- Tested stripping In-Context Learning (ICL) prompts and modifying prompt handling for synonyms.
+- Optimized target GPU usage parameters (A100/vRAM limits ~1.7-2.2G) and checked if models (MLP, `en_core_sci_sm`) successfully loaded to GPU.
+
+#### Search & Fact Extraction
+- Updated search strategy for fallback logic (prioritize retrieval when zero facts are returned).
+- Modified web search configurations and experimented with Simple Search MCP. We latter decided not using the Simple Search MCP because it might failed in the future implementation.
+- Investigated issues with fact extraction for longer texts. Tested `paper_text` lengths (up to 50k tokens) and chunking techniques on PMID `24884436`; large context windows passed manual tests.
+- Evaluated generated queries via `refine_search_for_failed_papers`.
+
+#### Evaluation & Testing
+- Calculated token cost and time for 402 claims evaluations (Opus vs. Sonnet run tests). Added logic for skipping completed subsets while processing batch tasks.
+- Addressed evaluation edge cases where models struggled to refute false graphs. Re-evaluated why "supported" verdicts failed (e.g., GNAI1 activating HCK missed full-text for PMID 11007482). 
+- Created `flip` logic to inverse claims (added "not" logic), refactored `construct_signor_claim` and `RLM`, and reran tests over 91 rows.
+- Analyzed specific SIGNOR edges (-156958, -278744, -138463, etc.) for convergence patterns; identified models defaulting to UNCERTAIN when direct evidence is lacking, instead of WRONG. Updated sufficiency prompt definitions which successfully changed predictions back to WRONG.
+- Run single 3 repeat test with max_iter=10 (https://drive.google.com/drive/folders/1_klHKxR2KDBVS6fx9OB_s6-8ahybg7Z-?usp=drive_link). We iteratively update the framework by first update the web search and run another run with 1 repear and max_iter=4 (https://drive.google.com/drive/folders/1IFSMDec9KmsnlidfprCd5cTNOp5s1vnP?usp=drive_link). Then we tested the new run with slm based sufficient classifier (https://drive.google.com/drive/folders/17cLjEsnNeJjgqidlYymYLo3eUjtsBTxO?usp=drive_link). So far the cost is approximately 0.6 usd per claim.
+- Now we can seperate the claim job to 4 a100 gpu. It took approximately 6 hours to finish all the ~100 claims.
+
+#### Reading
+- https://gxl.ai/blog/biomedical-literature-as-a-filesystem
+
 ## 260313 ##
 
 ### Agent GRN correction
