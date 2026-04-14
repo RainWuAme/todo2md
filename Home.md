@@ -1,3 +1,57 @@
+## 260414 ##
+
+### Agent GRN Correction
+
+#### Label Definition & Dataset Setup
+- Added our label definitions to the paper.
+- Modified signor claim formating in `build_datasets.py`.
+- In connectomeDB, we decided to remove the "no primary evidence" label category, since those cases often had reliable evidence that our agent could retrieve.
+
+#### Claim Format Refinement
+- Explored reformulating the original claim: `{A} directly interacts with {B} in the context of cell-cell communication in human`.
+- Final decision with Aurelien: `In the context of protein-protein interactions, {A} as ligand directly interacts with {B} as receptor.`
+- Start another run with this modification.
+
+#### Error Analysis & Evaluation Spreadsheet
+- Analyzed per-category accuracy and root causes of errors.
+- Tested refutation cases:
+  - Intracellular AFDN–EPHA7 → answered correctly.
+  - Wrong direction ITGB2–THY1 → answered incorrectly (uncertain whether data label or agent is at fault).
+  - In-cis interaction LY86–CD180 → answered incorrectly (agent cannot distinguish cis vs. trans interactions).
+- Consolidated all evaluation information into a single spreadsheet. https://docs.google.com/spreadsheets/d/1Gt6KQgwial7hID197sLGMcWcbQL8EzLxi2VcetJ5sB4/edit?usp=sharing
+- Merged branches, removed duplicate rows, and grayed out non-protein-protein interaction rows.
+- Emailed Aurelien to clean rows 45–48 and requested he add comments about Claude's reasoning on conflicting cases.
+
+#### Architecture & Context Cost Investigation
+- Reviewed the current plan and deepened understanding of the cache mechanism: it is the full message history (system prompt, user prompt, assistant reasoning, tool results).
+- Investigated removing cache entirely and reconstructing inputs from `EvidenceState` on each call.
+- Identified that the agent performs gap search in iteration 1, indicating a prompt handling issue.
+- Attempted **notebook injection**: ultimately more expensive due to heavy cache creation noise from the notebook content.
+- Investigated history summary injection vs. direct notebook info as alternatives.
+- Addressed the MCP cold-start issue: handled persistent MCP connection to avoid re-initialization on every `query()` call.
+
+#### Prompt Optimization
+- Attempted notebook injection as a context strategy.
+- Updated plan to include an auto-stop mechanism when sufficiency stops increasing across iterations.
+- Analyzed context cost breakdown with Claude; determined context sizes are within normal range (not approaching auto-compact).
+
+#### Cost Analysis & Planning
+- Carefully reviewed the cost report with Claude and made targeted modifications.
+- Drafted an accuracy improvement plan grounded in the cost report findings.
+- P0 cleanup: removed debug print statements.
+
+#### Large-Scale Evaluation Runs (SIGNOR & ConnectomeDB)
+- Ran SIGNOR evaluation to benchmark current cost and accuracy: starting cost 2.28, final score 93 → total spend ≈ 91.28 USD, averaging ~0.9 USD per edge.
+- Kicked off ConnectomeDB evaluation run.
+- Created a parallel submit script for ConnectomeDB batch jobs.
+- Updated SIGNOR-fact data to reflect our current label definitions.
+- Reviewed Lun's SIGNOR edges and confirmed a flip error existed.
+- Modified the claim repo directly and added the updated prompt.
+
+#### Haiku Sufficient Classifier
+- Implemented a Haiku-based sufficient classifier as a lightweight sufficiency check.
+- Ran unit tests to verify correctness.
+
 ## 260405 ##
 
 ### Job Search
