@@ -1,3 +1,90 @@
+## 260424 ##
+
+### Agent GRN Correction
+
+#### Paper Writing
+- Wrote the LLM sufficiency subagent section for the paper.
+- Added the results section to the paper.
+- Created 1–2 publication-ready figures for the paper.
+- Wrote the main body text.
+
+#### ConnectomeDB Re-run
+- Re-ran ConnectomeDB evaluation.
+- Wrote resume code to recover from a previous interrupted run.
+- Updated ConnectomeDB claim to emphasize extracellular context.
+- Ran ConnectomeDB test run after subclaim and claim improvements.
+
+#### SIGNOR Data & Benchmarking
+- Updated `signor-fact` dataset.
+- Removed unknown-label entries from SIGNOR.
+- Modified the SIGNOR submit script to enable benchmark runs.
+- Adjusted SIGNOR data count.
+- Analyzed SIGNOR direct interaction results; discovered support accuracy dropped significantly.
+- Modified SIGNOR claim to explicitly emphasize direct interaction.
+- Test-ran SIGNOR with Haiku + reasoning enabled.
+
+#### Context / Prompt Ablation Testing
+- Tested removing the phrase "In the context of protein-protein interactions" from the claim and observed the effect on final verdicts.
+  - **B2M–CD1A**: original verdict was SUPPORT (incorrect); removing the context phrase → correctly yielded REFUTE.
+  - **AANAT–MTNR1A**: without context, label is REFUTE; reason given was "Not a protein-protein interaction."
+- Tested direct evidence programming approach.
+
+#### Root Cause Analysis & Debugging
+- Confirmed labels were assigned correctly (support accuracy issue was not a labeling error).
+- Suspected subagent temperature was causing instability; ran test claims at `temp=0.7` and `temp=0.7 + thinking mode`.
+- Identified root cause: the model version was set to `claude-4` instead of `claude-4.6`, causing subclaim generation failures and downstream fact extraction breakdown.
+- Cleaned up the adjusted code to remove the unintended version change and pushed.
+
+#### Accuracy Improvement Experiments
+- **Subclaim + synonym instructions + orchestrator search query + Haiku + reasoning**: accuracy improved ~10% (one additional tier unlocked).
+- **Claude 4.6, no extended thinking**: accuracy = 0.74.
+- Investigated potential web search leakage (ConnectomeDB data appearing in search results): manually sampled ~279/2,719 search queries and confirmed **no leakage**. Also noted that adding web search to ProClaim helps identify synonyms earlier.
+- Sent two controversial verdicts to the curator for review.
+- Used Gemini to review error traces (providing both the reason and the full trace).
+
+#### Agent Architecture & Step Optimization
+- Adjusted `max_turns`; clarified that total agent step limit = `max_iterations × max_turns`.
+- Analyzed historical step-count distribution across all prior runs:
+  - ~50 steps covers most cases; current ceiling was 120.
+  - 35–38 steps covers ~90% of cases.
+  - SIGNOR max: 73 steps (SIGNOR-175304); ConnectomeDB max: 67 steps (TNFSF13_TNFRSF11B).
+  - Decision: set `max_turns = 10` and `max_iterations = 4`.
+- Added early-stop rule: if a full iteration yields zero new facts, stop immediately; changed overall max steps to 40.
+
+#### Subclaim Improvements
+- Tested using only the claim (no subclaim) with single-paper extraction to isolate the issue.
+- Tested **MELTF_PLG** with paper 15936756: even without subclaim, could not get a REFUTE verdict.
+- Tried `qwen2.5-14b-instruct` as the subclaim sub-agent → no improvement.
+- Identified structural issue: fact extraction receives claim + subclaim + paper, but neither claim nor subclaim can be dynamically corrected mid-run.
+- Reviewed the `extraction_context` implementation plan: allows the AI agent to append explanatory notes to subclaims mid-run, enabling better synonym disambiguation.
+- Implemented and tested `extraction_context`.
+- Removed a subclaim that lacked directional information, which was degrading fact extraction quality.
+- Tested with `claude-4.6` after the fix; confirmed improvement.
+- Re-tested with local model: when sufficient information is provided, correct SUPPORT/REFUTE results are obtained.
+- Considered ICL (in-context learning) for subclaim generation: one example each for SIGNOR and SciFact benchmarks.
+
+#### Search & Fact Extraction Exploration
+- Investigated the impact of adding web search at the fact extraction stage (aids synonym discovery).
+- Checked whether ReAct uses web search.
+- Tried `claude-sonnet-4.6` for fact extraction; decided to keep `qwen3.5-9b`.
+
+#### Verdict Re-ranking & Trace Review
+- Tested giving agent traces to a new reasoning LLM for re-verdict: 4/26 incorrect cases flipped to correct; broader impact is uncertain without knowing the effect on already-correct cases.
+- Focused analysis on incorrect cases: asked LLM to provide a verdict based on its own knowledge first, then provided the trace to check for verdict changes.
+- Considered additionally providing `evidence_state` to the re-ranking LLM.
+- Added trace links to SIGNOR-fact entries for incorrect cases and requested the team (Aurelien et al.) to review traces and either fix their prompts or identify the point where the agent went off track.
+- Investigated why some `flip=true` cases are now yielding incorrect verdicts; flagged specific cases for review:
+  - SIGNOR-52875, SIGNOR-70866, SIGNOR-45343, SIGNOR-98716, SIGNOR-260008, SIGNOR-250006, SIGNOR-51652, SIGNOR-255657.
+
+---
+
+### Job Search (求職)
+
+#### Delta Electronics (台達電子)
+- Completed the personal profile form for Delta Electronics.
+- Reviewed Delta Electronics general company information.
+- Reviewed Delta Electronics Research Institute information.
+
 ## 260414 ##
 
 ### Agent GRN Correction
