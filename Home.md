@@ -1,3 +1,64 @@
+## 260515 ##
+
+### Agent GRN Correction (ProClaim)
+
+#### Dataset & Claim Processing
+- Modified SIGNOR claim format: stripped parenthetical entity details from claims to prevent the agent from over-narrowing its fact search.
+- Updated `add_extraction_context_note` prompt to provide only synonyms (not additional claim refinements).
+- Revisited and more explicitly re-defined the workflow: enforced paper filtering step and removed `relevant_subclaims` from fact extraction schema → **accuracy reached 0.75 on SIGNOR**.
+
+#### Debugging & Root Cause Analysis
+- Investigated and tested a series of hypotheses for agent accuracy issues:
+  - Tried increasing `max_turns` alone → no improvement.
+  - Tested switching to `qwen3.6-27b` → no meaningful difference.
+  - Tried removing web search entirely → no improvement.
+  - Tested `add_extraction_context_note` as root cause → partially confirmed; revised prompt to synonym-only.
+  - Tested detailed (parenthetical) vs. short claims → detailed claims caused the agent to over-search granular details.
+  - Investigated whether web search was the culprit for specific failures → inconclusive.
+
+#### Sufficiency Classifier Experiments
+- Tested whether adding entity synonyms to sufficiency classifier input claims improves the sufficiency score → impact negligible, decided against this change.
+- Diagnosed issue where the agent was reading all papers upfront and triggering sufficient classifier prematurely; corrected the workflow.
+- Investigated `qwen3.5-9b` uncertain cases: suspected hardware instability; removed uncertain cases and re-ran baseline → accuracy improved too much, indicating p-hacking risk; discarded this approach.
+
+#### Cost Tracking
+- Refactored cost calculation to match the base-case approach; confirmed `cost_tracker` is now in use.
+- Double-checked token usage code; confirmed no issues.
+
+#### Ablation Studies
+- **Tau ablation**: ran and analyzed results for `tau=0.00` and `tau=0.25` (seed 42).
+  - Observation: more iterations generally increase accuracy.
+- **Iteration ablation**: ran 1–5 iterations on SIGNOR (no web search) → accuracy is consistent.
+- Ran SIGNOR without web search → accuracy results are consistent with prior runs.
+
+#### Paper Writing (NeurIPS Submission)
+- Performed a comprehensive line-by-line read-through of the manuscript:
+- Modified Section 3.2.
+- Added computation information to the appendix.
+- **NeurIPS manuscript submitted**.
+- Read *DeepFact: Co-Evolving Benchmarks and Agents for Deep Research Factuality*.
+
+---
+
+### Job Search (求職)
+
+#### Delta Research Center (台達電研究院) — Second Interview Prep
+- Prepared and iterated on interview slides https://drive.google.com/file/d/1eXRcmGgAPcd4AflDiwjQDio-wjSnSZhQ/view?usp=drive_link:
+- Updated CV: changed parameter count to 198.
+- Iterated on slides with Claude (2 rounds).
+- Updated 104 CV to correct key errors.
+
+#### Logistics & Communication
+- Emailed Julio with expected return date and 1-on-1 scheduling request.
+- Applied for the Ministry of Science and Technology project change (聲請科技部計劃變更).
+- Notified Martin of return date.
+
+---
+
+### Other (其他)
+- Reviewed the return-to-Taiwan policy rules; confirmed NCKU notification is required — Sent an email to 李政起.
+- Gathered and prepared necessary return documents.
+
 ## 260424 ##
 
 ### Agent GRN Correction
